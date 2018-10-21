@@ -1,6 +1,17 @@
 #ifndef FILEMANAGEMENT_H
 #define FILEMANAGEMENT_H
 
+//////////////////////////////////////////////////////////////////////////////////////
+// FileManagement.h - Abstracts away the details of the file system					//
+// ver 4.2																			//
+// Language:    C++, Visual Studio 2017												//
+// Platform:    Microsoft Surface Pro 4, Windows 10									//
+// Application: Project 1, Single Node Map/Reduce Program							//
+// Author:      Bubah Conteh, Syracuse University CSE 687 - Object Oriented Design	//
+//              bconteh@syr.edu														//
+//////////////////////////////////////////////////////////////////////////////////////
+
+
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <iostream>
@@ -17,29 +28,29 @@ class FileManagement
 {
 public:
 	FileManagement(); //Default Constructor
-	FileManagement(string, string = "", string = ""); //Constructor with 3 params
-	FileManagement(FileManagement &&) = delete;  //Disable Move constructor
-	//void createInputDir(path); //creates the input directory
-	//void createTmpDir(path tmpDir);	//creates the temporary directory
-	//void createOutputDir(path outputDir);
-	void writeToInputFile(string, string);
-	string readFromInputFile(string);
-	void writeToTmpFile(string, string);
-	string readFromTmpFile(string);
-	void writeToOutputFile(string, string);
-	string readFromOutputFile(string);
-	fs::directory_iterator getTmpFileName();  //gets name of file directory iterator is currently pointing to.
-	fs::directory_iterator getInputFileName();
-	fs::directory_iterator getOutputFileName();
+	FileManagement(string inputD, string tmpD = "C:\\SU\\CSE_687\\IntermFile", string outputD = "C:\\SU\\CSE_687\\OuputFile"); //Constructor with 3 params
+	void writeToInputFile(string inputFileName, string fileContent);
+	string readFromInputFile(string inputFileName);
+	void writeToTmpFile(string tmpFileName, string fileContent);
+	string readFromTmpFile(string tmpFileName);
+	void writeToOutputFile(string outputFileName, string fileContent);
+	string readFromOutputFile(string outputFileName);
+	string getTmpFileName(void);  //gets name of file directory iterator is currently pointing to.
+	string getInputFileName(void);
+	string getOutputFileName(void);
+	fs::path getInputDir(void);
+	void incrementInputFilePointer(void);
+	void incrementTmpFilePointer(void);
+	void incrementOutputFilePointer(void);
 
 private:
 	fs::path inputDir;
 	fs::path tmpDir;
 	fs::path outputDir;
-	static fs::directory_iterator inputDirItr;  //iterates through files in directory
-	static fs::directory_iterator tmpDirItr;
-	static fs::directory_iterator outputDirItr;
-	void createFile(string); //create a file
+	fs::directory_iterator inputDirItr{ inputDir };  //iterates through files in directory
+	fs::directory_iterator tmpDirItr{ tmpDir };
+	fs::directory_iterator outputDirItr{ outputDir };
+	//void createFile(string); //create a file
 };
 
 #endif // !FILEMANAGEMENT_H

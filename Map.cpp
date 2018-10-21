@@ -4,26 +4,26 @@
 
 Map::Map() :wordsSize{ 0 } {}
 
-void Map::mapper(string inputFileName, string FileContent, string tmpFileName) {
+void Map::mapper(string inputFileName, string FileContent, string tmpFileName, FileManagement &fileObj) {
 	tokenizer(FileContent);
 	for (string word : words) {
-		emmitter(word, "1", tmpFileName);
+		emmitter(word, "1", tmpFileName, fileObj);
 	}
 }
 
-void Map::tokenizer(string FileName, string FileContent)
+void Map::tokenizer(string FileContent)
 {
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-	boost::char_separator<char> sep{ ",.`~@#$%^&*-_+=(){}[]<>\/|?':; " }; //characters to disregard/supress
+	boost::char_separator<char> sep{ ",.`~@#$%^&*-_+=(){}[]<>\/|?':;! " }; //characters to disregard/supress
 	tokenizer tok{ FileContent, sep };
 	for (const auto &t : tok) {
 		this->words.push_back(t);
 		this->wordsSize = words.size();  //Calculate vector size
-		std::cout << t << '\n';
 	}
 }
 
-void Map::emmitter(string key, string value, string tmpFileName)
+void Map::emmitter(string key, string value, string tmpFileName, FileManagement &fileObj)
 {
-	
+	const string keyValueParse = key + "," + value;
+	fileObj.writeToTmpFile(tmpFileName, keyValueParse);
 }
