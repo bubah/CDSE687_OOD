@@ -3,7 +3,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////
 // FileManagement.h - Abstracts away the details of the file system					//
-// ver 4.2																			//
+// ver 1.0																			//
 // Language:    C++, Visual Studio 2017												//
 // Platform:    Microsoft Surface Pro 4, Windows 10									//
 // Application: Project 1, Single Node Map/Reduce Program							//
@@ -17,10 +17,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
+using std::vector;
 namespace fs = boost::filesystem;
 
 
@@ -28,12 +30,15 @@ class FileManagement
 {
 public:
 	FileManagement(); //Default Constructor
-	FileManagement(string inputD, string tmpD = "C:\\SU\\CSE_687\\IntermFile", string outputD = "C:\\SU\\CSE_687\\OuputFile"); //Constructor with 3 params
+	FileManagement(string inputD, string tmpD = "C:\\CSE687\\Dev\\MapReduce\\MapReduce\\TempDir", string outputD = "C:\\CSE687\\Dev\\MapReduce\\MapReduce\\OutputDir"); //Constructor with 3 params
 	void writeToInputFile(string inputFileName, string fileContent);
+	
 	string readFromInputFile(string inputFileName);
 	void writeToTmpFile(string tmpFileName, string fileContent);
+	void writeToTmpFile(string tmpFileName, vector<string> fileContent);
 	string readFromTmpFile(string tmpFileName);
 	void writeToOutputFile(string outputFileName, string fileContent);
+	void writeToOutputFile(string outputFileName, vector<string> fileContent);
 	string readFromOutputFile(string outputFileName);
 	string getTmpFileName(void);  //gets name of file directory iterator is currently pointing to.
 	string getInputFileName(void);

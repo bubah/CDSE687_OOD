@@ -1,7 +1,6 @@
 #include "Map.h"
 #include "FileManagement.h"
 
-
 Map::Map() :wordsSize{ 0 } {}
 
 void Map::mapper(string inputFileName, string FileContent, string tmpFileName, FileManagement &fileObj) {
@@ -14,9 +13,10 @@ void Map::mapper(string inputFileName, string FileContent, string tmpFileName, F
 void Map::tokenizer(string FileContent)
 {
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-	boost::char_separator<char> sep{ ",.`~@#$%^&*-_+=(){}[]<>\/|?':;! " }; //characters to disregard/supress
+	boost::char_separator<char> sep{ ",.`~@#$%^&*-_+=(){}[]<>\/|?':;!\n " }; //characters to disregard/supress
 	tokenizer tok{ FileContent, sep };
-	for (const auto &t : tok) {
+	for (auto t : tok) {
+		boost::algorithm::to_lower(t);
 		this->words.push_back(t);
 		this->wordsSize = words.size();  //Calculate vector size
 	}

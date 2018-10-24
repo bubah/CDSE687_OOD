@@ -1,9 +1,9 @@
-#ifndef MAP_H
-#define MAP_H
+#ifndef SORT_H
+#define SORT_H
 
 //////////////////////////////////////////////////////////////////////////////////////
-// Map.h - tokenizes string of raw data into unique words and exports intermediate	//
-//		   key/value pair.															//
+// Sort.h - Sorts intermediate key/value pair stored in temp directory				//
+// ver 1.0																			//
 // Language:    C++, Visual Studio 2017												//
 // Platform:    Microsoft Surface Pro 4, Windows 10									//
 // Application: Project 1, Single Node Map/Reduce Program							//
@@ -14,30 +14,26 @@
 #include <boost/tokenizer.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/algorithm/string.hpp>  
+#include <boost/tokenizer.hpp>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include "FileManagement.h"
-using std::cin;
+#include<vector>
+#include "KeyValue.h"
 using std::cout;
 using std::endl;
-using std::string;
 using std::vector;
+using std::string;
 namespace fs = boost::filesystem;
 
-class Map
+class Sort
 {
 public:
-	Map(); //Default Constructor
-	void mapper(string inputFileName, string FileContent, string tmpFileName, FileManagement &); 
-
+	Sort(string);
+	void SortData();
+	vector<string> exportSortedData();
 private:
-	void tokenizer(string fileContent); //extracts words from input files
-	void emmitter(string key, string value, string tmpFileName, FileManagement &); //exports key/Value to interm file
-	size_t wordsSize; // buffer size
-	vector<string> words;  //buffer to store tokenized words
+	vector<string> wordsVector;
+	int vectorSize;
+	bool sorted;
 };
 
-#endif // !MAP_H
-
+#endif
