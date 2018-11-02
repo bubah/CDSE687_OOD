@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <boost/log/trivial.hpp>
 
 class Reduce
 {

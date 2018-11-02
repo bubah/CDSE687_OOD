@@ -1,6 +1,8 @@
 #ifndef EXECUTIVE_H
 #define EXECUTIVE_H
 
+#include <boost/log/trivial.hpp>
+
 #include <iostream>
 using std::string;
 

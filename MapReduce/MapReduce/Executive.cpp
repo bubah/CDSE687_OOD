@@ -75,47 +75,9 @@ string getUserInput()
 	return userInput;
 }
 
-/*
-#include <iostream>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem.hpp>
-#include <string>
-#include "Executive.h"
-
-using std::cin;
-using std::cout;
-using std::endl;
-using std::string;
-namespace fs = boost::filesystem;
-
-
-Executive::Executive()
-{
-}
-
-Executive::~Executive()
-{
-}
-
-string Executive::getUserInput()
-{
-	string userInput;
-	bool isFalse = true;
-
-	while (isFalse)
-	{
-		getline(cin, userInput);
-		fs::path pathInput(userInput);
-
-		if (!fs::exists(userInput))
-		{
-			cout << "Directory does not exist. Please re-enter: ";
-			isFalse = true;
-		}
-		else
-			isFalse = false;
-	}
-
-	return userInput;
-}
-*/
+/*int main() {
+	FileManagement fm("C:\\testInput", "C:\\testTemp", "C:\\testOutput");
+	cout << fm.getInputFileName() << endl;
+	cout << fm.readFromTmpFile(fm.getTmpFileName()) << endl;
+	fm.writeToInputFile("john", "him");
+}*/

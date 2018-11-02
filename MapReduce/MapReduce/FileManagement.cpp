@@ -1,21 +1,22 @@
-//////////////////////////////////////////////////////////////////////////////////////
-// FileManagement.cpp - Application interface to the filesystem operations			//
-// ver 1.0																			//
-// Language:    C++, Visual Studio 2017												//
-// Platform:    Microsoft Surface Pro 4, Windows 10									//
-// Application: Project 1, Single Node Map/Reduce Program							//
-// Author:      Bubah Conteh, Syracuse University CSE 687 - Object Oriented Design	//
-//              bconteh@syr.edu														//
-//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// FileManagement.cpp - Application interface to the filesystem operations		
+// ver 1.0																			
+// Language:    C++, Visual Studio 2017											
+// Platform:    Microsoft Surface Pro 4, Windows 10								
+// Application: Project 1, Single Node Map/Reduce Program						
+// Author:      Bubah Conteh, 
+//				Syracuse University CSE 687 - Object Oriented Design
+//              bconteh@syr.edu														
+////////////////////////////////////////////////////////////////////////////////
+
 
 #include "FileManagement.h"
 #include "FileManagementException.h"
 
-FileManagement::FileManagement() :inputDir{ "" }, tmpDir{ "" }, outputDir{ "" } {}
 
-
-FileManagement::FileManagement(string inputD, string tmpD, string outputD) : inputDir{ inputD }, tmpDir{ tmpD }, outputDir{ outputD }
-{}
+FileManagement::FileManagement(string inputD, string tmpD, string outputD) 
+	: inputDir{ inputD }, tmpDir{ tmpD }, outputDir{ outputD }
+{BOOST_LOG_TRIVIAL(info) << "Instantiating a file management object using constructor" << "\n"; }
 
 
 void FileManagement::writeToInputFile(string inputFileName, string fileContent)
@@ -37,13 +38,15 @@ void FileManagement::writeToInputFile(string inputFileName, string fileContent)
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << inputFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error writing to file '" << inputFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 }
 
 
 string FileManagement::readFromInputFile(string inputFileName)
 {
+	BOOST_LOG_TRIVIAL(info) << "Now reading input directory from file '" << inputFileName << "'" << "\n";
 	fs::path inputFile_Path(inputFileName);
 	string record{ "" }; // Declare string variable for storing file content
 
@@ -63,17 +66,18 @@ string FileManagement::readFromInputFile(string inputFileName)
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << inputFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error reading from file '" << inputFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 
 	return record;
 }
 
 
-void FileManagement::writeToTmpFile(const string tmpFileName, const string fileContent)
+void FileManagement::writeToTmpFile(string tmpFileName, 
+									string fileContent)
 {
-	fs::path tmp = tmpDir;
-	//fs::path tmpFile_Path(tmpFileName);
+	fs::path tmp(tmpDir);
 	
 	try {
 		if (!exists(tmp)) // if file does not exist throw error and abort program/process
@@ -90,15 +94,16 @@ void FileManagement::writeToTmpFile(const string tmpFileName, const string fileC
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << tmpFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error writing to file '" << tmpFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 }
 
 
-void FileManagement::writeToTmpFile(string tmpFileName, vector<string> fileContent)
+void FileManagement::writeToTmpFile(string tmpFileName, 
+									vector<string> fileContent)
 {
-	fs::path tmp = tmpDir;
-	//fs::path tmpFile_Path(tmpFileName);
+	fs::path tmp(tmpDir);
 
 	try {
 		if (!exists(tmp)) // if file does not exist throw error and abort program/process
@@ -120,14 +125,15 @@ void FileManagement::writeToTmpFile(string tmpFileName, vector<string> fileConte
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << tmpFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error writing to file '" << tmpFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 }
 
 
 string FileManagement::readFromTmpFile(string tmpFileName)
 {
-	//fs::path tmpFile_Path(tmpFileName);
+	BOOST_LOG_TRIVIAL(info) << "Now reading interm directory from file '" << tmpFileName << "'" << "\n";
 	fs::path tmp(tmpDir);
 	string record{ "" }; // Declare string variable for storing file content
 
@@ -148,7 +154,8 @@ string FileManagement::readFromTmpFile(string tmpFileName)
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << tmpFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error reading from file '" << tmpFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 
 	return record;
@@ -157,9 +164,9 @@ string FileManagement::readFromTmpFile(string tmpFileName)
 
 void FileManagement::writeToOutputFile(string outputFileName, string fileContent)
 {
+	BOOST_LOG_TRIVIAL(info) << "Now writing to output directory to file '" << outputFileName << "'" << "\n";
 	// Make a copy to avoid overwriting the private data member
 	fs::path tmp = outputDir;
-	//fs::path outputFile_Path(outputDir);
 
 	try {
 		if (!exists(tmp)) // if file does not exist throw error and abort program/process
@@ -176,15 +183,17 @@ void FileManagement::writeToOutputFile(string outputFileName, string fileContent
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << outputFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error writing to file '" << outputFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 }
 
 
-void FileManagement::writeToOutputFile(string outputFileName, vector< std::pair<string, int> > fileContent)
+void FileManagement::writeToOutputFile(string outputFileName, 
+									vector< std::pair<string, int> > fileContent)
 {
+	BOOST_LOG_TRIVIAL(info) << "Now writing to output directory to file '" << outputFileName << "'" << "\n";
 	fs::path tmp = outputDir;
-	//fs::path outputFile_Path(outputDir);
 
 	try {
 		if (!exists(tmp)) // if file does not exist throw error and abort program/process
@@ -203,13 +212,15 @@ void FileManagement::writeToOutputFile(string outputFileName, vector< std::pair<
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << outputFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error writing to file '" << outputFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 }
 
 
 string FileManagement::readFromOutputFile(string outputFileName)
 {
+	BOOST_LOG_TRIVIAL(info) << "Now reading output directory from file '" << outputFileName << "'" << "\n";
 	fs::path outputFile_Path(outputFileName);
 	string record{ "" }; // Declare string variable for storing file content
 
@@ -230,32 +241,13 @@ string FileManagement::readFromOutputFile(string outputFileName)
 	}
 	catch (FileDoesNotExist &error1) //
 	{
-		std::cerr << "File " << outputFileName << " error: " << error1.what() << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "error reading from file '" << outputFileName << "'. "
+			<< error1.what() << std::endl;
 	}
 
 	return record;
 }
 
-
-/*void FileManagement::createFile(string fileName)
-{
-fs::path p1(fileName); //create a path object
-fs::ofstream ofs(p1); //creates file
-try {
-if (ofs.fail())  //if file creation fails print error and abort()
-{
-cout << "File creation fialed!";
-}
-else //Close file
-{
-ofs.close();
-}
-}
-catch (fs::filesystem_error &e) {
-std::cerr << e.what() << std::endl;
-abort();
-}
-}*/
 
 string FileManagement::getInputFileName()
 {
@@ -342,8 +334,14 @@ fs::path FileManagement::getInputDir()
 	return inputDir;
 }
 
+fs::path FileManagement::getTempDir()
+{
+	return tmpDir;
+}
+
 
 bool FileManagement::isHidden(string filename)
 {
 	return (filename[0] == '.');
 }
+

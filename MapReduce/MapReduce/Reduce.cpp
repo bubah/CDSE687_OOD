@@ -40,11 +40,13 @@ private:
 Reduce::Reduce(string outputDir)
 	:_dirOutput(outputDir)
 {
+	BOOST_LOG_TRIVIAL(info) << "Instantiating a Ruduce object using constructor Reduce(string)" << "\n";
 }
 
 // Constructor taking intermediate data and the FileManagement object
 vector < std::pair<string, int> > Reduce::Reducer(string tmpData, FileManagement &fmObj)
 {
+	BOOST_LOG_TRIVIAL(info) << "Now running Reduce class public method Reducer(string, FileManagement &)" << "\n";
 	sumResults(tmpData);
 
 	// Return the data as a vector of pairs
@@ -54,6 +56,7 @@ vector < std::pair<string, int> > Reduce::Reducer(string tmpData, FileManagement
 // Sum up the repeated tokens (regardless of case) and send to output vector
 void Reduce::sumResults(string mapData)
 {
+	BOOST_LOG_TRIVIAL(info) << "Now running Reduce class public method sumResults(string)" << "\n";
 	typedef bm::bimap <bm::unordered_set_of <std::string>, bm::list_of <counter> > word_counter;
 	typedef boost::tokenizer<boost::char_separator<char> > text_tokenizer;
 	
@@ -78,6 +81,7 @@ void Reduce::sumResults(string mapData)
 // Getter for the output vector
 vector < std::pair<string, int> > Reduce::getOutputVector()
 {
+	BOOST_LOG_TRIVIAL(info) << "Now invoking Reduce class public getter method getOutputVector(void)" << "\n";
 	return _outputVector;
 }
 
@@ -90,6 +94,7 @@ void Reduce::_exportResults(std::string key, int value)
 
 void Reduce::writeSuccessFile(FileManagement &fmObj)
 {
+	BOOST_LOG_TRIVIAL(info) << "Now invoking Reduce class public method writeSuccessFile(FileManagement &)" << "\n";
 	// Create an empty file flagging the SUCCESS status
 	fmObj.writeToOutputFile("SUCCESS", "");
 }
