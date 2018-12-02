@@ -10,7 +10,6 @@
 //
 ///////////////////////////////////////////////////////////////////
 
-
 #include <Windows.h>
 #include "filemanagement.h"
 #include "directory_management.h"
@@ -25,6 +24,10 @@
 typedef MapInterface*(*myFNPTR)(size_t);
 typedef ReduceInterface*(*myFNPTR2)(std::string);
 typedef std::vector < std::pair < std::string, std::string>> vector_pair_str;
+
+size_t partitionFunction(size_t numberMap, size_t totalFileLines) {
+	return ceil((double)totalFileLines / numberMap);
+}
 
 void EmptyBuffer(vector_pair_str *buffered_memory, size_t buffer, std::string filename,
 	std::string input_dir, std::string temp_dir, std::string output_dir, std::string dll_dir) {
@@ -59,7 +62,26 @@ int Workflow::WorkflowMain(std::string input_dir, std::string temp_dir,
 	// Declare an instance of the FileManagement class
 	FileManagement fmobj(input_dir, temp_dir, output_dir, dll_dir);
 	DirectoryManagement dmobj(input_dir, temp_dir, output_dir, dll_dir);
-	const char* text = dll_dir.c_str();
+
+	int i = MapWorkFlow(dmobj, fmobj); // Run Map Phase
+
+	//Sort data in temp file
+	Sort<std::string> st(fmobj.ReadWholeFile(dmobj.GetTempFilename(), dmobj.GetTempDir()));
+	st.SortData();
+	std::vector<std::string> mystr = st.ExportSortedData();
+	fmobj.WriteToTempFile(dmobj.GetTempFilename(), mystr, dmobj.GetTempDir());
+
+	int j = ReduceWorkFlow(dmobj, fmobj); // Run Reduce Phase
+
+	// Write the SUCCESS file
+	WriteSuccessFile(fmobj, dmobj.GetOutputDir());
+
+	return 0;
+}
+
+int Workflow::MapWorkFlow(DirectoryManagement &dm, FileManagement& fm) {
+	std::string dll_string = dm.GetDllDir().string();
+	const char* text = dll_string.c_str();
 	wchar_t wtext[100];
 	size_t outsize;
 	mbstowcs_s(&outsize, wtext, text, strlen(text) + 1); // Plus null
@@ -67,14 +89,14 @@ int Workflow::WorkflowMain(std::string input_dir, std::string temp_dir,
 	HINSTANCE hInst = LoadLibrary(ptr);
 
 	if (!hInst) {
-		std::cout << "\nCould not load the Map Library";
+		BOOST_LOG_TRIVIAL(info) << "\nCould not load the Map Library";
 		return EXIT_FAILURE;
 	}
 
 	//Resolve the function address
-	myFNPTR fn = (myFNPTR)GetProcAddress(hInst, "CreateMap");
-	if (!fn) {
-		std::cout << "\nCould not locate the createMap function";
+	myFNPTR Map = (myFNPTR)GetProcAddress(hInst, "CreateMap");
+	if (!Map) {
+		BOOST_LOG_TRIVIAL(info) << "\nCould not locate the createMap function";
 		return EXIT_FAILURE;
 	}
 
@@ -83,64 +105,61 @@ int Workflow::WorkflowMain(std::string input_dir, std::string temp_dir,
 	////////////////////////////////////////////////////////////////////
 
 	// Run the map process
-	MapInterface* mp = fn(100000);
+	MapInterface* mp = Map(100000);
 
 	static vector_pair_str *buffered_memory = new vector_pair_str(); // Memory buffer passed to Map function
 
-	while ("-1" != dmobj.GetInputFilename()) {
-		BOOST_LOG_TRIVIAL(info) << "Processing file: " << dmobj.GetInputFilename();
+	while ("-1" != dm.GetInputFilename()) {
+		BOOST_LOG_TRIVIAL(info) << "Processing file: " << dm.GetInputFilename();
 		std::string str{ "" };
-		boost::filesystem::path inputPath(dmobj.GetInputFilename());
+		boost::filesystem::path inputPath(dm.GetInputFilename());
 		boost::filesystem::ifstream ifs{ inputPath };
 
 		while (!ifs.eof()) { // loop until reach end of file
-			mp->Mapper(dmobj.GetInputFilename(), fmobj.ReadFromInputFile(dmobj.GetInputFilename(), ifs),
-				dmobj.GetTempFilename(), dmobj.GetInputDir().string(), dmobj.GetTempDir().string(),
-				dmobj.GetOutputDir().string(), dmobj.GetDllDir().string(), Emit, buffered_memory);
+			mp->Mapper(dm.GetInputFilename(), fm.ReadLineFromFile(dm.GetInputFilename(), ifs),
+				dm.GetTempFilename(), dm.GetInputDir().string(), dm.GetTempDir().string(),
+				dm.GetOutputDir().string(), dm.GetDllDir().string(), Emit, buffered_memory);
 		}
 
-		dmobj.IncrementInputFilePointer(); // increment file pointer
+		dm.IncrementInputFilePointer(); // increment file pointer
 	}
 
 	// release remaining data in buffer to file.
-	EmptyBuffer(buffered_memory, 0, dmobj.GetTempFilename(), dmobj.GetInputDir().string(),
-		dmobj.GetTempDir().string(), dmobj.GetOutputDir().string(), dmobj.GetDllDir().string());
+	EmptyBuffer(buffered_memory, 0, dm.GetTempFilename(), dm.GetInputDir().string(),
+		dm.GetTempDir().string(), dm.GetOutputDir().string(), dm.GetDllDir().string());
+	return 0;
+}
 
-	//Sort data in temp file
-	Sort<std::string> st(fmobj.ReadFromTempFile(dmobj.GetTempFilename(), dmobj.GetTempDir()));
-	st.SortData();
-	std::vector<std::string> mystr = st.ExportSortedData();
-	fmobj.WriteToTempFile(dmobj.GetTempFilename(), mystr, dmobj.GetTempDir());
+int Workflow::ReduceWorkFlow(DirectoryManagement &dm, FileManagement& fm) {
+	std::string dll_string = dm.GetDllDir().string();
+	const char* text = dll_string.c_str();
+	wchar_t wtext[100];
+	size_t outsize;
+	mbstowcs_s(&outsize, wtext, text, strlen(text) + 1); // Plus null
+	LPWSTR ptr = wtext;
+	HINSTANCE hInst = LoadLibrary(ptr);
 
-	// Load in and pass in the temp string to the reducer
-	std::string mapData = fmobj.ReadFromTempFile(dmobj.GetTempFilename(), dmobj.GetTempDir());
+
+	std::string mapData = fm.ReadWholeFile(dm.GetTempFilename(), dm.GetTempDir());
 
 	////////////////////////////////////////////////////////////////////
 	///////////////////////////////|   REDUCE
 	////////////////////////////////////////////////////////////////////
-	myFNPTR2 fn2 = (myFNPTR2)GetProcAddress(hInst, "CreateReduce");
+	myFNPTR2 Reduce = (myFNPTR2)GetProcAddress(hInst, "CreateReduce");
 
-	if (!fn2)
+	if (!Reduce)
 	{
 		std::cout << "\nCould not locate the create Reduce function";
 		return EXIT_FAILURE;
 	}
 
 	// Run the reduce process and write SUCCESS file when complete
-	ReduceInterface* rd = fn2(dmobj.GetOutputDir().string());
+	ReduceInterface* rd = Reduce(dm.GetOutputDir().string());
 
 	// Reduce the sorted map data
 	std::vector< std::pair<std::string, std::string> > vectorData = rd->Reducer(mapData);
 
-	// Sort the reduced map data prior to writing to output directory
-	Sort< std::vector< std::pair<std::string, std::string> >> st2(vectorData);
-
 	// Write the reduced/sorted map data
-	fmobj.WriteToOutputFile(dmobj.GetOutputFilename(), vectorData, dmobj.GetOutputDir());
-
-	// Write the SUCCESS file
-	WriteSuccessFile(fmobj, dmobj.GetOutputDir());
-
+	fm.WriteToOutputFile(dm.GetOutputFilename(), vectorData, dm.GetOutputDir());
 	return 0;
-
 }

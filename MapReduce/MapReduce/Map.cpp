@@ -34,7 +34,7 @@ void Map::tokenizer(const string FileContent)
 {
 	BOOST_LOG_TRIVIAL(info) << "Now running Map Class private method tokenizer(string)" << "\n";
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer; 
-	boost::char_separator<char> sep{ "	,.`~@#$%^&*-_+=(){}[]<>\/|?':;! " }; // characters to disregard/supress
+	boost::char_separator<char> sep{ "	,.`~@#$%^&*-_+=(){}[]<>\/|?':;!\t\n " }; // characters to disregard/supress
 	tokenizer tok{ FileContent, sep };
 	for (auto t : tok) {
 		boost::algorithm::to_lower(t); // set words to lower case

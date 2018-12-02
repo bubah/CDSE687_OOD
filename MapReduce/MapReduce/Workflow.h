@@ -16,17 +16,16 @@
 
 #include <boost/log/trivial.hpp>
 #include <iostream>
-using std::string;
 
 class Workflow
 {
 public:
-	Workflow(string, string, string);
+	Workflow(std::string, std::string, std::string, std::string);
 
 private:
-	string dirInput;
-	string dirOutput;
-	string dirTemp;
+	std::string dirInput;
+	std::string dirOutput;
+	std::string dirTemp;
 };
 
 #endif

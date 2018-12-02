@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Map.h - tokenizes string of raw data into unique words and exports 
-//			intermediate key/value pair.															
+// Map.h - Tokenize a string of raw data to unique words and exports 
+//			intermediate key/value pair to interm file.															
 // Language:    C++, Visual Studio 2017												
 // Platform:    Microsoft Surface Pro 4, Windows 10									
 // Application: Project 1, Single Node Map/Reduce Program							
@@ -32,8 +32,6 @@ class Map
 public:
 	// Default Constructor
 	Map(const size_t buffer = 100000);
-
-	
 
 	// Mapper function calls prive method 'tokenizer'
 	void mapper(const string inputFileName, const string FileContent, const string tmpFileName, FileManagement &);

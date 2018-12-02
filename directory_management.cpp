@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////////////
-// directory_management.h - Abstracts away the details of the file system			//
-// ver 1.0																			//
-// Language:    C++, Visual Studio 2017												//
-// Platform:    Microsoft Surface Pro 4, Windows 10									//
-// Application: Project 2, Single Node Map/Reduce Program							//
-// Author:      Rolb Hardisty/Bubah Conteh,                                         //
-//              Syracuse University CSE 687 - Object Oriented Design	            //
-//              bconteh@syr.edu														//
-//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// directory_management.h - Abstracts away the details of the file system	
+// ver 1.0																		
+// Language:    C++, Visual Studio 2017										
+// Platform:    Microsoft Surface Pro 4, Windows 10							
+// Application: Project 2, Single Node Map/Reduce Program					
+// Author:      Rolb Hardisty/Bubah Conteh,                                   
+//              Syracuse University CSE 687 - Object Oriented Design	       
+//              bconteh@syr.edu												
+///////////////////////////////////////////////////////////////////////////////
 
 #include "directory_management.h"
 #include "filemanagement_exception.h"
@@ -15,10 +15,28 @@
 
 DirectoryManagement::DirectoryManagement() {}
 
-DirectoryManagement::DirectoryManagement(std::string inpath, std::string tmppath, std::string outpath, std::string dllpath)
-	:input_dir{ inpath }, temp_dir{ tmppath }, output_dir{ outpath }, dll_dir{ dllpath }{BOOST_LOG_TRIVIAL(info) << "Directory Manager constr" << "\n"; }
-	// Returns the current filename of the file pointed to by the iterator
+DirectoryManagement::DirectoryManagement(std::string inpath,
+std::string tmppath, std::string outpath, std::string dllpath) 
+:input_dir_{ inpath }, temp_dir_{ tmppath }, output_dir_{ outpath },
+dll_dir_{ dllpath }{
+	BOOST_LOG_TRIVIAL(info) << "Directory Manager constr" << "\n"; }
 
+DirectoryManagement::DirectoryManagement(const DirectoryManagement& dm)
+	: input_dir_{ dm.GetInputDir() }, temp_dir_{ dm.GetTempDir() },
+	output_dir_{ dm.GetOutputDir() }, dll_dir_{ dm.GetDllDir() }{}
+
+DirectoryManagement& DirectoryManagement::operator=(
+	const DirectoryManagement& dm) {
+	if (this == &dm) return *this;
+	input_dir_ = dm.GetInputDir();
+	temp_dir_ = dm.GetTempDir();
+	output_dir_ = dm.GetOutputDir();
+	dll_dir_ = dm.GetDllDir();
+
+	return *this;
+}
+
+	// Returns the current filename of the file pointed to by the iterator
 std::string DirectoryManagement::GetTempFilename()  //gets name of file directory iterator is currently pointing to.
 {
 	if (temp_dir_itr == boost::filesystem::directory_iterator{}) {
@@ -85,9 +103,7 @@ std::string DirectoryManagement::GetOutputFilename()
 	return output_filepath.string();
 }
 
-
-
-std::string DirectoryManagement::GetFilenameFromPath(std::string filename_and_path) {
+std::string DirectoryManagement::GetFilenameFromPath(const std::string &filename_and_path) {
 
 	boost::filesystem::path p(filename_and_path);
 	boost::filesystem::path filename = p.filename();
@@ -95,59 +111,45 @@ std::string DirectoryManagement::GetFilenameFromPath(std::string filename_and_pa
 
 }
 
-
-
-boost::filesystem::path DirectoryManagement::GetInputDir()
+boost::filesystem::path DirectoryManagement::GetInputDir() const
 {
-	return input_dir;
+	return input_dir_;
 }
 
-
-
-boost::filesystem::path DirectoryManagement::GetTempDir()
+boost::filesystem::path DirectoryManagement::GetTempDir() const
 {
-	return temp_dir;
+	return temp_dir_;
 }
 
-
-
-boost::filesystem::path DirectoryManagement::GetOutputDir()
+boost::filesystem::path DirectoryManagement::GetOutputDir() const
 {
-	return output_dir;
+	return output_dir_;
 }
 
-
-
-boost::filesystem::path DirectoryManagement::GetDllDir()
+boost::filesystem::path DirectoryManagement::GetDllDir() const
 {
-	return dll_dir;
+	return dll_dir_;
 }
 
-
-
-const boost::filesystem::directory_iterator DirectoryManagement::GetInputIterator()
+const boost::filesystem::directory_iterator DirectoryManagement::GetInputIterator() const
 {
 	return input_dir_itr;
 }
 
-const boost::filesystem::directory_iterator DirectoryManagement::GetTempIterator()
+const boost::filesystem::directory_iterator DirectoryManagement::GetTempIterator() const
 {
 	return temp_dir_itr;
 }
 
-const boost::filesystem::directory_iterator DirectoryManagement::GetOutputIterator()
+const boost::filesystem::directory_iterator DirectoryManagement::GetOutputIterator() const
 {
 	return output_dir_itr;
 }
-
-
 
 void DirectoryManagement::IncrementInputFilePointer()
 {
 	input_dir_itr++;
 }
-
-
 
 void DirectoryManagement::IncrementTmpFilePointer()
 {
@@ -159,7 +161,7 @@ void DirectoryManagement::IncrementOutputFilePointer()
 	output_dir_itr++;
 }
 
-bool DirectoryManagement::IsHidden(std::string filename)
+bool DirectoryManagement::IsHidden(const std::string &filename)
 {
 	return (filename[0] == '.');
 }

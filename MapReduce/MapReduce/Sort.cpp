@@ -13,11 +13,12 @@
 
 
 // Class constructor accepts string of raw data
-Sort::Sort(string fileContent) :sorted{ false }
+template <typename T>
+Sort<T>::Sort(string fileContent) :sorted{ false }
 {
 	BOOST_LOG_TRIVIAL(info) << "Instantiating a Sort object using constructor Sort(string)" << "\n";
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-	boost::char_separator<char> sep{ "	 " }; //characters to disregard/supress
+	boost::char_separator<char> sep{ "\t\n " }; //characters to disregard/supress
 	tokenizer tok{ fileContent, sep };
 
 	for (const auto &t : tok) {
@@ -29,7 +30,8 @@ Sort::Sort(string fileContent) :sorted{ false }
 
 
 // Class constructor Overloaded to accept vector of string data
-Sort::Sort(vector<string> fileContent) :sorted{ false }
+template <typename T>
+Sort<T>::Sort(vector<string> fileContent) :sorted{ false }
 {
 	BOOST_LOG_TRIVIAL(info) << "Instantiating a Sort object using constructor Sort(vector<string>)" << "\n";
 	for (const auto &t : fileContent) {
@@ -40,16 +42,18 @@ Sort::Sort(vector<string> fileContent) :sorted{ false }
 
 
 // Overloaded to accept a vector of pairs as file content input and std::sort
-void Sort::sortVectorData( vector<std::pair<std::string, int>> &fileContent )
+/*template<typename T>
+//void Sort::sortVectorData( vector<std::pair<std::string, int>> &fileContent )
+void Sort::sortVectorData( T &fileContent )
 {
 	BOOST_LOG_TRIVIAL(info) << "Now invoking Sort Class public method sortVectorData(vector<string, int> &) to sort data" << "\n";
 	// Sort by key
 	std::sort(fileContent.begin(), fileContent.end());
 	sorted = true; // Sets class member data "sorted" to true
-}
+}*/
 
-
-void Sort::SortData() {
+template <typename T>
+void Sort<T>::SortData() {
 	BOOST_LOG_TRIVIAL(info) << "Now invoking Sort Class public method sortData() to sort private data member vector<string>" << "\n";
 	std::sort(wordsVector.begin(), wordsVector.end());
 	sorted = true; // Sets class member data "sorted" to true
@@ -58,7 +62,8 @@ void Sort::SortData() {
 
 
 // Return the sorted data, otherwise notify user "not sorted"
-vector<string> Sort::exportSortedData()
+template <typename T>
+vector<string> Sort<T>::exportSortedData()
 {
 	BOOST_LOG_TRIVIAL(info) << "Now exporting Sorted data by invoking Sort class public method exportSortedData()" << "\n";
 	if (!sorted) {
