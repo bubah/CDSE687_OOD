@@ -1,38 +1,41 @@
-#ifndef MAPREDUCE_H
-#define MAPREDUCE_H
+#ifndef MAP_H
+#define MAP_H
 
-#include <iostream>
-#include <string>
+///////////////////////////////////////////////////////////////////////////////
+// Map.h - Interface for Map class ver 1.0
+//														
+// Language:    C++, Visual Studio 2017												
+// Platform:    Microsoft Surface Pro 4, Windows 10									
+// Application: Project 1, Single Node Map/Reduce Program							
+// Author:      Bubah Conteh, Syracuse University CSE 687 - 
+//				Object Oriented Design	
+//              bconteh@syr.edu														
+///////////////////////////////////////////////////////////////////////////////
+
 #include <boost/tokenizer.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/log/trivial.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <fstream>
 #include <vector>
+#include <string>
 
 namespace fs = boost::filesystem;
 
 class MapInterface {
 public:
-
 	//Default Constructor
-	MapInterface(size_t buffer = 0):bufferCap{buffer}{}
+	MapInterface(size_t buffer = 0):bufferCap_{buffer}{}
 	virtual ~MapInterface() {}
 
 	// Mapper function
-	virtual void Mapper(const std::string inputFileName, const std::string FileContent, 
-		const std::string tmpFileName, std::string inputDir, std::string tempDir, std::string outputDir, std::string dll_dir,
-		void(*FNPTR_EMIT)(std::string, std::string, std::string, size_t buffer,
-		std::string, std::string, std::string, std::string, std::vector<std::pair<std::string, std::string>> *bufferMemory),
-		std::vector<std::pair<std::string, std::string>> *bufferMemory)=0  ;
+	virtual void Mapper(const std::string key, 
+		const std::string value, std::function<void(std::string, std::string, size_t)>) = 0;
 
 	// Returns beffer capacity
-	int GetBufferCap() { return bufferCap; }
-	void SetBufferCap(size_t buffer) { bufferCap = buffer; }
+	size_t GetBufferCap() { return bufferCap_; }
+	void SetBufferCap(size_t buffer) { bufferCap_ = buffer; }
 private:
-	size_t bufferCap; // Buffer cap
+	size_t bufferCap_; // Buffer cap
 };
 
 #endif
